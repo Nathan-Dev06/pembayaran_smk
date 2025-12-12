@@ -1,0 +1,78 @@
+.container-siswa {
+    padding: 24px;
+}
+
+.title-page {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.card-siswa {
+    background: white;
+    padding: 16px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.label {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.sub-label {
+    font-size: 14px;
+    color: gray;
+}
+
+.table-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.table-tagihan {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-tagihan th,
+.table-tagihan td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+.table-tagihan tr:hover {
+    background: #f9f9f9;
+}
+
+.empty-row {
+    text-align: center;
+    color: gray;
+}
+
+/* STATUS WARNA */
+.status.belum {
+    color: red;
+    font-weight: bold;
+}
+
+.status.proses {
+    color: orange;
+    font-weight: bold;
+}
+
+.status.sudah {
+    color: green;
+    font-weight: bold;
+}
+
+/* BUTTON */
+.btn-bayar {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
