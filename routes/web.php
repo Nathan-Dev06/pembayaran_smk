@@ -95,4 +95,16 @@ Route::middleware(['auth', SessionTimeout::class])->group(function () {
         
         return view('siswa.dashboard');
     })->name('dashboard');
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN ROUTES
+    |--------------------------------------------------------------------------
+    | Route khusus untuk admin dan kepsek
+    | Middleware tambahan untuk memastikan role admin/kepsek
+    */
+    Route::middleware(['role:admin,kepsek'])->prefix('admin')->name('admin.')->group(function () {
+        // Siswa Management Routes
+        Route::resource('siswa', \App\Http\Controllers\SiswaController::class);
+    });
 });

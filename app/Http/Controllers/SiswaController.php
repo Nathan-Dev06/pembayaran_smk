@@ -11,13 +11,13 @@ class SiswaController extends Controller
     public function index()
     {
         $siswas = Siswa::all();
-        return view('siswa.index', compact('siswas'));
+        return view('admin.siswa.index', compact('siswas'));
     }
 
     // Menampilkan form untuk menambahkan siswa baru
     public function create()
     {
-        return view('siswa.create');
+        return view('admin.siswa.create');
     }
 
     // Menyimpan data siswa baru ke database
@@ -32,13 +32,13 @@ class SiswaController extends Controller
 
         Siswa::create($request->all());
 
-        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil ditambahkan.');
+        return redirect()->route('admin.siswa.index')->with('success', 'Data siswa berhasil ditambahkan.');
     }
 
     // Menampilkan form untuk mengedit siswa
     public function edit(Siswa $siswa)
     {
-        return view('siswa.edit', compact('siswa'));
+        return view('admin.siswa.edit', compact('siswa'));
     }
 
     // Mengupdate data siswa
@@ -53,13 +53,13 @@ class SiswaController extends Controller
 
         $siswa->update($request->all());
 
-        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diupdate.');
+        return redirect()->route('admin.siswa.index')->with('success', 'Data siswa berhasil diupdate.');
     }
 
     // Menghapus data siswa
     public function destroy(Siswa $siswa)
     {
         $siswa->delete();
-        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil dihapus.');
+        return redirect()->route('admin.siswa.index')->with('success', 'Data siswa berhasil dihapus.');
     }
 }
