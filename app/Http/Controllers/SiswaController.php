@@ -10,7 +10,8 @@ class SiswaController extends Controller
     // Menampilkan daftar siswa
     public function index()
     {
-        $siswas = Siswa::all();
+        // PERBAIKAN: Menggunakan paginate() agar fitur halaman (links) berfungsi
+        $siswas = Siswa::paginate(10);
         return view('admin.siswa.index', compact('siswas'));
     }
 
