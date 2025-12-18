@@ -4,14 +4,12 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\SessionTimeout;
 use App\Http\Controllers\TagihanController;
-
+use App\Http\Controllers\PembayaranController; // Pastikan controller dipanggil
 
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES
 |--------------------------------------------------------------------------
-| Route ini dapat diakses tanpa login.
-| Fungsi: Redirect ke login atau dashboard jika sudah login
 */
 Route::get('/', function () {
     if (Auth::check()) {
@@ -22,104 +20,76 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| LOGIN ROUTES
+| LOGIN & LOGOUT ROUTES
 |--------------------------------------------------------------------------
-| Route untuk menampilkan halaman login dan memproses login user
-| GET  /login  - Menampilkan form login
-| POST /login  - Memproses input email & password
 */
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
 Route::post('/login', function (\Illuminate\Http\Request $request) {
-    // Validasi input dari form login
     $credentials = $request->validate([
         'email' => 'required|email',
         'password' => 'required',
     ]);
 
-    // Coba melakukan authentication dengan email & password
     if (Auth::attempt($credentials)) {
-        // Jika berhasil, regenerate session untuk keamanan
         $request->session()->regenerate();
         return redirect('/dashboard');
     }
 
-    // Jika gagal, kembali ke form login dengan error message
     return back()->withErrors([
         'email' => 'Email atau password salah.',
     ])->onlyInput('email');
 })->name('auth.login');
 
-/*
-|--------------------------------------------------------------------------
-| LOGOUT ROUTE
-|--------------------------------------------------------------------------
-| Route untuk logout user
-| POST /logout - Menghapus session user dan redirect ke home
-| Middleware 'auth' memastikan hanya user yang login dapat logout
-*/
 Route::post('/logout', function (\Illuminate\Http\Request $request) {
-    // Logout user dari aplikasi
     Auth::logout();
-
-    // Invalidate session untuk security
     $request->session()->invalidate();
-
-    // Regenerate CSRF token
     $request->session()->regenerateToken();
-
-    // Redirect ke home page
     return redirect('/');
 })->name('logout')->middleware('auth');
 
 /*
 |--------------------------------------------------------------------------
-| DASHBOARD ROUTES (PROTECTED)
+| DASHBOARD & ADMIN ROUTES (PROTECTED)
 |--------------------------------------------------------------------------
-| Route ini hanya bisa diakses oleh user yang sudah login
-| Middleware 'auth' = User harus login
-| Middleware 'SessionTimeout' = Check session timeout (2 jam idle)
-|
-| Logika:
-| - Role 'admin' atau 'kepsek' -> Dashboard Admin
-| - Role 'siswa' -> Dashboard Siswa
 */
 Route::middleware(['auth', SessionTimeout::class])->group(function () {
+
+    // 1. DASHBOARD UTAMA
     Route::get('/dashboard', function () {
         $user = Auth::user();
-
-        // Redirect berdasarkan role user
         if ($user->role === 'admin' || $user->role === 'kepsek') {
             return view('admin.dashboard');
         }
-
         return view('siswa.dashboard');
     })->name('dashboard');
 
     /*
     |--------------------------------------------------------------------------
-    | ADMIN ROUTES
+    | KHUSUS ADMIN
     |--------------------------------------------------------------------------
-    | Route khusus untuk admin dan kepsek
-    | Middleware tambahan untuk memastikan role admin/kepsek
+    | Semua route di bawah ini otomatis punya awalan URL: /admin/...
+    | dan punya awalan Nama Route: admin....
     */
     Route::middleware(['role:admin,kepsek'])->prefix('admin')->name('admin.')->group(function () {
-        // Siswa Management Routes
+
+        // A. Manajemen Siswa (Otomatis index, create, store, dll)
         Route::resource('siswa', \App\Http\Controllers\SiswaController::class);
-        // ... di dalam group admin ...
 
-    // 1. Route untuk MENAMPILKAN Form (Create)
-    Route::get('/tagihan/create', [TagihanController::class, 'create'])->name('tagihan.create');
+        // B. Manajemen Tagihan (Manual Route)
+        Route::get('/tagihan/create', [TagihanController::class, 'create'])->name('tagihan.create');
+        Route::post('/tagihan', [TagihanController::class, 'store'])->name('tagihan.store');
+        Route::get('/tagihan', [TagihanController::class, 'index'])->name('tagihan.index');
 
-    // 2. Route untuk MENYIMPAN Data (Store)
-    Route::post('/tagihan', [TagihanController::class, 'store'])->name('tagihan.store');
+        // C. Manajemen Pembayaran (Resource Route)
+        // INI YANG BENAR: Langsung taruh di sini, jangan bikin group admin lagi
+        Route::resource('pembayaran', PembayaranController::class);
 
-    // 3. Route Index (YANG SUDAH ADA - taruh di bawah create biar aman)
-    Route::get('/tagihan', [TagihanController::class, 'index'])->name('tagihan.index');
     });
 
+<<<<<<< HEAD
     Route::prefix('admin/tagihan')->name('admin.tagihan.')->group(function () {
     Route::get('/', [TagihanController::class, 'index'])->name('index');
     Route::get('/create', [TagihanController::class, 'create'])->name('create');
@@ -132,4 +102,6 @@ Route::middleware(['auth', SessionTimeout::class])->group(function () {
         ->name('massal.store');
 });
 
+=======
+>>>>>>> 911112f5258688af278d7877a14c53e9462ee795
 });
