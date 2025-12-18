@@ -3,8 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\SessionTimeout;
+<<<<<<< Updated upstream
 use App\Http\Controllers\TagihanController;
 use App\Http\Controllers\PembayaranController; // Pastikan controller dipanggil
+=======
+use App\Http\Controllers\SiswaTagihanController;
+>>>>>>> Stashed changes
 
 /*
 |--------------------------------------------------------------------------
@@ -12,10 +16,7 @@ use App\Http\Controllers\PembayaranController; // Pastikan controller dipanggil
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect('/dashboard');
-    }
-    return redirect('/login');
+    return Auth::check() ? redirect('/dashboard') : redirect('/login');
 });
 
 /*
@@ -28,6 +29,10 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::post('/login', function (\Illuminate\Http\Request $request) {
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     $credentials = $request->validate([
         'email' => 'required|email',
         'password' => 'required',
@@ -43,6 +48,14 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
     ])->onlyInput('email');
 })->name('auth.login');
 
+<<<<<<< Updated upstream
+=======
+/*
+|--------------------------------------------------------------------------
+| LOGOUT ROUTE
+|--------------------------------------------------------------------------
+*/
+>>>>>>> Stashed changes
 Route::post('/logout', function (\Illuminate\Http\Request $request) {
     Auth::logout();
     $request->session()->invalidate();
@@ -52,11 +65,16 @@ Route::post('/logout', function (\Illuminate\Http\Request $request) {
 
 /*
 |--------------------------------------------------------------------------
+<<<<<<< Updated upstream
 | DASHBOARD & ADMIN ROUTES (PROTECTED)
+=======
+| PROTECTED ROUTES (AUTH + SESSION TIMEOUT)
+>>>>>>> Stashed changes
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', SessionTimeout::class])->group(function () {
 
+<<<<<<< Updated upstream
     // 1. DASHBOARD UTAMA
     Route::get('/dashboard', function () {
         $user = Auth::user();
@@ -86,6 +104,47 @@ Route::middleware(['auth', SessionTimeout::class])->group(function () {
         // C. Manajemen Pembayaran (Resource Route)
         // INI YANG BENAR: Langsung taruh di sini, jangan bikin group admin lagi
         Route::resource('pembayaran', PembayaranController::class);
+=======
+    // DASHBOARD
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
+
+        if (in_array($user->role, ['admin', 'kepsek'])) {
+            return view('admin.dashboard');
+        }
+
+        return view('siswa.dashboard');
+    })->name('dashboard');
+
+    // =====================================================
+    // 📌 ADMIN – Halaman Index Data Siswa
+    // =====================================================
+    Route::get('/siswa', function () {
+        return view('admin.siswa.index');
+    })->name('siswa.index');
+
+    // =====================================================
+    // 📌 SISWA – Tagihan
+    // Middleware role:siswa supaya hanya siswa bisa akses
+    // =====================================================
+    Route::middleware(['role:siswa'])->group(function () {
+
+        Route::get('/siswa/tagihan', 
+            [SiswaTagihanController::class, 'index']
+        )->name('siswa.tagihan.index');
+
+        Route::get('/siswa/tagihan/{id}', 
+            [SiswaTagihanController::class, 'show']
+        )->name('siswa.tagihan.show');
+
+        Route::get('/siswa/tagihan/{id}/bayar', 
+            [SiswaTagihanController::class, 'bayar']
+        )->name('siswa.tagihan.bayar');
+
+        Route::post('/siswa/tagihan/{id}/bayar', 
+            [SiswaTagihanController::class, 'prosesBayar']
+        )->name('siswa.tagihan.proses');
+>>>>>>> Stashed changes
 
     });
 
