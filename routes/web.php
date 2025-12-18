@@ -119,4 +119,17 @@ Route::middleware(['auth', SessionTimeout::class])->group(function () {
     // 3. Route Index (YANG SUDAH ADA - taruh di bawah create biar aman)
     Route::get('/tagihan', [TagihanController::class, 'index'])->name('tagihan.index');
     });
+
+    Route::prefix('admin/tagihan')->name('admin.tagihan.')->group(function () {
+    Route::get('/', [TagihanController::class, 'index'])->name('index');
+    Route::get('/create', [TagihanController::class, 'create'])->name('create');
+    Route::post('/store', [TagihanController::class, 'store'])->name('store');
+
+    // 🔥 ROUTE BARU (MASSAL)
+    Route::get('/massal/create', [TagihanController::class, 'createMassal'])
+        ->name('massal.create');
+    Route::post('/massal/store', [TagihanController::class, 'storeMassal'])
+        ->name('massal.store');
+});
+
 });

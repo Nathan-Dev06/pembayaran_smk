@@ -56,6 +56,17 @@
                     </div>
                     
                     <div class="col-md-3">
+                        <label class="form-label small text-muted fw-bold">Jenis Pembayaran</label>
+                        <select class="form-select bg-light border-0" name="jenis_pembayaran">
+                            <option value="">Semua Jenis</option>
+                            <option value="SPP" {{ request('jenis_pembayaran') == 'SPP' ? 'selected' : '' }}>SPP</option>
+                            <option value="Uang Gedung" {{ request('jenis_pembayaran') == 'Uang Gedung' ? 'selected' : '' }}>Uang Gedung</option>
+                            <option value="Uang Ujian" {{ request('jenis_pembayaran') == 'Uang Ujian' ? 'selected' : '' }}>Uang Ujian</option>
+                        </select>
+                    </div>
+
+                    
+                    <div class="col-md-3">
                         <label class="form-label small text-muted fw-bold">Status Tagihan</label>
                         <select class="form-select bg-light border-0" name="status">
                             <option value="">Semua Status</option>
@@ -79,9 +90,16 @@
             <div class="fw-bold text-primary">
                 <i class="bi bi-table me-1"></i> Daftar Tagihan
             </div>
-            <a href="{{ route('admin.tagihan.create') }}" class="btn btn-primary btn-sm px-3">
-                <i class="bi bi-plus-lg"></i> Buat Tagihan Baru
-            </a>
+            <div class="d-flex gap-2">
+    <a href="{{ route('admin.tagihan.create') }}" class="btn btn-primary btn-sm px-3">
+        <i class="bi bi-person-plus"></i> Tagihan Tunggal
+    </a>
+
+    <a href="{{ route('admin.tagihan.massal.create') }}" class="btn btn-success btn-sm px-3">
+        <i class="bi bi-people-fill"></i> Tagihan Per Kelas / Angkatan
+    </a>
+</div>
+
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
