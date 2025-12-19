@@ -15,6 +15,8 @@ class Siswa extends Model
         'nis',
         'nama',
         'kelas',  // sekarang string langsung
+        'jurusan',
+        'angkatan',
         'email',
     ];
 

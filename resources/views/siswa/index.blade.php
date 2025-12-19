@@ -1,14 +1,20 @@
 @extends('layouts.app')
 
+@section('title', 'Daftar Tagihan Siswa')
+
 @section('content')
 <div class="container-siswa">
+
+    {{-- Judul Halaman --}}
     <h1 class="title-page">Daftar Tagihan Siswa</h1>
 
+    {{-- Informasi Siswa --}}
     <div class="card-siswa">
         <p class="label">Nama: {{ auth()->user()->name }}</p>
         <p class="sub-label">NIS: {{ auth()->user()->nis ?? '-' }}</p>
     </div>
 
+    {{-- Tabel Tagihan --}}
     <div class="table-card">
         <table class="table-tagihan">
             <thead>
@@ -34,9 +40,9 @@
                     </td>
                     <td>
                         @if ($t->status == 'belum')
-                        <a href="{{ route('siswa.tagihan.bayar', $t->id) }}" class="btn-bayar">Bayar</a>
+                            <a href="{{ route('siswa.tagihan.bayar', $t->id) }}" class="btn-bayar">Bayar</a>
                         @else
-                        <span class="text-muted">-</span>
+                            <span class="text-muted">-</span>
                         @endif
                     </td>
                 </tr>
@@ -46,7 +52,9 @@
                 </tr>
                 @endforelse
             </tbody>
+
         </table>
     </div>
+
 </div>
 @endsection

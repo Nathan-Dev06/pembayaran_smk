@@ -7,6 +7,7 @@ use App\Http\Controllers\TagihanController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\SiswaTagihanController; // Controller untuk Siswa Login
 
 /*
 |--------------------------------------------------------------------------
@@ -14,10 +15,7 @@ use App\Http\Controllers\SiswaController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect('/dashboard');
-    }
-    return redirect('/login');
+    return Auth::check() ? redirect('/dashboard') : redirect('/login');
 });
 
 /*
@@ -54,62 +52,80 @@ Route::post('/logout', function (\Illuminate\Http\Request $request) {
 
 /*
 |--------------------------------------------------------------------------
-| DASHBOARD & ADMIN ROUTES (PROTECTED)
+| PROTECTED ROUTES (AUTH + SESSION TIMEOUT)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', SessionTimeout::class])->group(function () {
 
-    // 1. DASHBOARD UTAMA
+    // 1. DASHBOARD (Bisa untuk Admin & Siswa)
     Route::get('/dashboard', function () {
         $user = Auth::user();
+        // Cek Role
         if ($user->role === 'admin' || $user->role === 'kepsek') {
             return view('admin.dashboard');
         }
         return view('siswa.dashboard');
     })->name('dashboard');
 
+
     /*
     |--------------------------------------------------------------------------
-    | KHUSUS ADMIN
+    | GROUP KHUSUS ADMIN & KEPSEK
     |--------------------------------------------------------------------------
-    | Semua route di bawah ini otomatis punya awalan URL: /admin/...
-    | dan punya awalan Nama Route: admin....
     */
     Route::middleware(['role:admin,kepsek'])->prefix('admin')->name('admin.')->group(function () {
 
         // A. Manajemen Siswa
         Route::resource('siswa', SiswaController::class);
 
-        // B. Manajemen Tagihan (Manual Route + Resource buat Hapus/Edit)
-        // Kita gunakan resource partial atau manual seperti yang kamu buat:
+        // B. Manajemen Tagihan
+        // 1. Tagihan Manual & Resource
         Route::get('/tagihan/create', [TagihanController::class, 'create'])->name('tagihan.create');
         Route::post('/tagihan', [TagihanController::class, 'store'])->name('tagihan.store');
         Route::get('/tagihan', [TagihanController::class, 'index'])->name('tagihan.index');
-        // Tambahan: Supaya tombol hapus/edit di tabel tagihan jalan, kita butuh ini:
+        
+        // 2. Tagihan Massal (Fitur Tambahan Kamu)
+        Route::get('/tagihan/massal/create', [TagihanController::class, 'createMassal'])->name('tagihan.massal.create');
+        Route::post('/tagihan/massal/store', [TagihanController::class, 'storeMassal'])->name('tagihan.massal.store');
+
+        // 3. Edit & Hapus Tagihan
         Route::get('/tagihan/{tagihan}/edit', [TagihanController::class, 'edit'])->name('tagihan.edit');
         Route::put('/tagihan/{tagihan}', [TagihanController::class, 'update'])->name('tagihan.update');
         Route::delete('/tagihan/{tagihan}', [TagihanController::class, 'destroy'])->name('tagihan.destroy');
 
 
         // C. Manajemen Pembayaran
-        // 1. Route Khusus Cetak Struk (Perorangan) - TARUH DI ATAS RESOURCE
+        // 1. Cetak Struk (Perorangan)
         Route::get('/pembayaran/{id}/cetak', [PembayaranController::class, 'cetak'])->name('pembayaran.cetak');
-        
-        // 2. Resource Utama Pembayaran
+        // 2. Resource Utama
         Route::resource('pembayaran', PembayaranController::class);
 
 
-        // D. Laporan Keuangan
+        // D. Laporan Keuangan (YANG KITA PERBAIKI TADI)
         // 1. Halaman Utama Laporan
         Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
 
-        // 2. Fitur Cetak Laporan Full (PDF)
+        // 2. Cetak Laporan Full (PDF)
         Route::get('/laporan/cetak', [LaporanController::class, 'cetak'])->name('laporan.cetak');
 
         // 3. Detail Laporan Per Kelas (Drill-down)
-        // PERBAIKAN DI SINI: Hapus 'admin.' karena group sudah memberikannya
+        // FIXED: Hapus 'admin.' di sini karena group sudah otomatis nambahin
         Route::get('/laporan/detail/{kelas}/{jurusan}', [LaporanController::class, 'detailKelas'])
             ->name('laporan.detail'); 
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | GROUP KHUSUS SISWA (Untuk melihat tagihan sendiri)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:siswa'])->group(function () {
+        Route::get('/siswa/tagihan', [SiswaTagihanController::class, 'index'])->name('siswa.tagihan.index');
+        Route::get('/siswa/tagihan/{id}', [SiswaTagihanController::class, 'show'])->name('siswa.tagihan.show');
+        // Jika ada fitur bayar online (opsional)
+        // Route::get('/siswa/tagihan/{id}/bayar', [SiswaTagihanController::class, 'bayar'])->name('siswa.tagihan.bayar');
+        // Route::post('/siswa/tagihan/{id}/bayar', [SiswaTagihanController::class, 'prosesBayar'])->name('siswa.tagihan.proses');
     });
 
 });
