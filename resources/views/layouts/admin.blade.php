@@ -45,10 +45,12 @@
             <a href="{{ route('admin.pembayaran.index') }}" class="nav-link {{ request()->routeIs('admin.pembayaran*') ? 'active' : '' }}">
                 <i class="bi bi-cash-coin"></i> Pembayaran
             </a>
-            </a>
-            <a href="#" class="nav-link">
+
+           {{-- MENU LAPORAN (SUDAH DIRAPIKAN) --}}
+            <a href="{{ route('admin.laporan.index') }}" class="nav-link {{ request()->routeIs('admin.laporan*') ? 'active' : '' }}">
                 <i class="bi bi-bar-chart"></i> Laporan
             </a>
+
             <a href="#" class="nav-link">
                 <i class="bi bi-gear"></i> Pengaturan
             </a>

@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\SessionTimeout;
 use App\Http\Controllers\TagihanController;
-use App\Http\Controllers\PembayaranController; // Pastikan controller dipanggil
+use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\SiswaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,18 +77,39 @@ Route::middleware(['auth', SessionTimeout::class])->group(function () {
     */
     Route::middleware(['role:admin,kepsek'])->prefix('admin')->name('admin.')->group(function () {
 
-        // A. Manajemen Siswa (Otomatis index, create, store, dll)
-        Route::resource('siswa', \App\Http\Controllers\SiswaController::class);
+        // A. Manajemen Siswa
+        Route::resource('siswa', SiswaController::class);
 
-        // B. Manajemen Tagihan (Manual Route)
+        // B. Manajemen Tagihan (Manual Route + Resource buat Hapus/Edit)
+        // Kita gunakan resource partial atau manual seperti yang kamu buat:
         Route::get('/tagihan/create', [TagihanController::class, 'create'])->name('tagihan.create');
         Route::post('/tagihan', [TagihanController::class, 'store'])->name('tagihan.store');
         Route::get('/tagihan', [TagihanController::class, 'index'])->name('tagihan.index');
+        // Tambahan: Supaya tombol hapus/edit di tabel tagihan jalan, kita butuh ini:
+        Route::get('/tagihan/{tagihan}/edit', [TagihanController::class, 'edit'])->name('tagihan.edit');
+        Route::put('/tagihan/{tagihan}', [TagihanController::class, 'update'])->name('tagihan.update');
+        Route::delete('/tagihan/{tagihan}', [TagihanController::class, 'destroy'])->name('tagihan.destroy');
 
-        // C. Manajemen Pembayaran (Resource Route)
-        // INI YANG BENAR: Langsung taruh di sini, jangan bikin group admin lagi
+
+        // C. Manajemen Pembayaran
+        // 1. Route Khusus Cetak Struk (Perorangan) - TARUH DI ATAS RESOURCE
+        Route::get('/pembayaran/{id}/cetak', [PembayaranController::class, 'cetak'])->name('pembayaran.cetak');
+        
+        // 2. Resource Utama Pembayaran
         Route::resource('pembayaran', PembayaranController::class);
 
+
+        // D. Laporan Keuangan
+        // 1. Halaman Utama Laporan
+        Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+
+        // 2. Fitur Cetak Laporan Full (PDF)
+        Route::get('/laporan/cetak', [LaporanController::class, 'cetak'])->name('laporan.cetak');
+
+        // 3. Detail Laporan Per Kelas (Drill-down)
+        // PERBAIKAN DI SINI: Hapus 'admin.' karena group sudah memberikannya
+        Route::get('/laporan/detail/{kelas}/{jurusan}', [LaporanController::class, 'detailKelas'])
+            ->name('laporan.detail'); 
     });
 
 });
