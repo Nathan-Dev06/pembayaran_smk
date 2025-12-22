@@ -25,6 +25,10 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+public function tagihan()
+{
+    return $this->hasMany(Tagihan::class, 'siswa_id');
+}
 
     /**
      * MASS ASSIGNABLE - Atribut yang bisa di-set via create() atau update()

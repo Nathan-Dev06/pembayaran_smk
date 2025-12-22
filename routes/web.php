@@ -8,6 +8,8 @@ use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\SiswaTagihanController; // Controller untuk Siswa Login
+use App\Http\Controllers\Siswa\SiswaDashboardController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -58,13 +60,16 @@ Route::post('/logout', function (\Illuminate\Http\Request $request) {
 Route::middleware(['auth', SessionTimeout::class])->group(function () {
 
     // 1. DASHBOARD (Bisa untuk Admin & Siswa)
-    Route::get('/dashboard', function () {
+     Route::get('/dashboard', function () {
         $user = Auth::user();
-        // Cek Role
-        if ($user->role === 'admin' || $user->role === 'kepsek') {
+
+        // admin / kepsek
+        if (in_array($user->role, ['admin', 'kepsek'])) {
             return view('admin.dashboard');
         }
-        return view('siswa.dashboard');
+
+        // siswa → arahkan ke controller
+        return redirect()->route('siswa.dashboard');
     })->name('dashboard');
 
 
@@ -113,7 +118,9 @@ Route::middleware(['auth', SessionTimeout::class])->group(function () {
         Route::get('/laporan/detail/{kelas}/{jurusan}', [LaporanController::class, 'detailKelas'])
             ->name('laporan.detail'); 
     });
-
+Route::middleware(['auth'])->group(function() {
+    Route::get('/siswa/dashboard', [SiswaDashboardController::class, 'index'])->name('siswa.dashboard');
+});
 
     /*
     |--------------------------------------------------------------------------

@@ -1,0 +1,26 @@
+body {
+    background-color: #f5f7fa;
+}
+
+.sidebar {
+    background-color: #1e3a8a; /* biru gelap */
+    min-height: 100vh;
+    color: white;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px 15px;
+}
+
+.sidebar a:hover {
+    background-color: #3749a0;
+    border-radius: 5px;
+}
+
+.card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
